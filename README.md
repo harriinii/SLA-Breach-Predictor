@@ -1,38 +1,40 @@
 # 🚀 AI-Powered SLA Breach Prediction System
 
-An intelligent support ticket monitoring platform that uses Large Language Models (LLMs) to automatically analyze support tickets, assign severity levels, predict SLA breach risks, generate real-time alerts, and provide operational analytics through an interactive Streamlit dashboard.
+An intelligent support ticket monitoring platform that uses Large Language Models (LLMs) to automatically analyze support tickets, assign severity levels, calculate SLA deadlines, predict SLA breach risks, generate WhatsApp alerts, and provide real-time operational analytics through an interactive Streamlit dashboard.
 
 ---
 
-## 📌 Project Overview
+# 📌 Project Overview
 
-Organizations often struggle to identify support tickets that are likely to violate Service Level Agreements (SLAs). Manual monitoring becomes difficult as ticket volumes increase.
+Organizations often struggle to monitor hundreds of support tickets and identify which tickets are likely to violate Service Level Agreements (SLAs).
 
-This project solves that problem by leveraging AI-powered ticket classification and SLA intelligence to:
+This project solves that problem using AI-powered ticket classification and SLA intelligence.
 
-- Analyze ticket descriptions automatically
-- Assign complexity scores (1–5)
-- Determine ticket priority levels
-- Calculate SLA deadlines dynamically
-- Predict potential SLA breaches
-- Generate critical alerts
-- Provide real-time operational analytics
-- Send WhatsApp notifications for high-risk incidents
+The system automatically:
+
+- Analyzes support ticket descriptions using LLMs
+- Assigns complexity scores (1–5)
+- Determines ticket priority levels
+- Calculates SLA deadlines dynamically
+- Detects critical breach-risk tickets
+- Sends WhatsApp alerts for urgent incidents
+- Tracks ticket lifecycle from Open → Closed
+- Provides real-time dashboards and analytics
 
 ---
 
-## 🎯 Problem Statement
+# 🎯 Problem Statement
 
-Support teams receive hundreds of tickets daily.
+Support teams handle large volumes of tickets daily.
 
-Without intelligent prioritization:
+Without intelligent monitoring:
 
 - Critical incidents may be overlooked
-- SLA deadlines can be missed
+- SLA deadlines may be missed
 - Customer satisfaction decreases
 - Revenue-impacting issues remain unresolved
 
-This system acts as an AI-powered Support Operations Assistant that continuously monitors tickets and identifies potential SLA violations before they occur.
+The AI-Powered SLA Breach Prediction System acts as a Support Operations Assistant that continuously evaluates ticket risk levels and highlights incidents requiring immediate attention.
 
 ---
 
@@ -40,33 +42,39 @@ This system acts as an AI-powered Support Operations Assistant that continuously
 
 ```text
                 +---------------------+
-                |   Support Engineer  |
+                | Support Engineer    |
                 +----------+----------+
                            |
                            v
-                +---------------------+
-                | Ticket Submission   |
-                | (Manual / CSV)      |
-                +----------+----------+
-                           |
-                           v
-                +---------------------+
-                | LLM Severity Engine |
-                | (Groq Llama 3.3)    |
-                +----------+----------+
-                           |
-        +------------------+------------------+
-        |                                     |
-        v                                     v
 
-+--------------------+           +--------------------+
-| Complexity Score   |           | Priority Mapping   |
-|      (1-5)         |           | Low / Med / High   |
-+---------+----------+           +---------+----------+
-          |                                |
-          +---------------+----------------+
-                          |
-                          v
+                +---------------------+
+                | Ticket Creation     |
+                | Manual / CSV Upload |
+                +----------+----------+
+                           |
+                           v
+
+                +---------------------+
+                | Groq LLM Engine     |
+                | Llama-3.3-70B       |
+                +----------+----------+
+                           |
+                           v
+
+                +---------------------+
+                | Complexity Scoring  |
+                | Score: 1 - 5        |
+                +----------+----------+
+                           |
+                           v
+
+                +---------------------+
+                | Priority Mapping    |
+                | Low / Med / High    |
+                | Critical            |
+                +----------+----------+
+                           |
+                           v
 
                 +---------------------+
                 | SLA Engine          |
@@ -82,13 +90,13 @@ This system acts as an AI-powered Support Operations Assistant that continuously
                 | Breached            |
                 +----------+----------+
                            |
-           +---------------+---------------+
-           |                               |
-           v                               v
+            +--------------+--------------+
+            |                             |
+            v                             v
 
 +---------------------+       +----------------------+
-| Dashboard Analytics |       | WhatsApp Alerts      |
-| Streamlit           |       | Twilio API           |
+| Streamlit Dashboard |       | WhatsApp Alerts      |
+| Analytics & Reports |       | Twilio API           |
 +---------------------+       +----------------------+
 ```
 
@@ -109,7 +117,7 @@ Support engineer enters:
 
 ### CSV Upload
 
-Bulk ticket upload using:
+Bulk ticket upload:
 
 ```csv
 customer_name,comment
@@ -121,7 +129,7 @@ Ravi,One customer cannot download invoice.
 
 ## Step 2: AI Ticket Analysis
 
-The ticket description is sent to the LLM.
+The ticket description is sent to the Groq LLM.
 
 The model evaluates:
 
@@ -141,11 +149,10 @@ Complexity Score = 1 to 5
 
 ## Step 3: Priority Assignment
 
-Based on complexity score:
-
-| Complexity | Priority |
-|------------|----------|
-| 1-2 | Low |
+| Complexity Score | Priority |
+|-----------------|----------|
+| 1 | Low |
+| 2 | Low |
 | 3 | Medium |
 | 4 | High |
 | 5 | Critical |
@@ -154,10 +161,8 @@ Based on complexity score:
 
 ## Step 4: SLA Deadline Calculation
 
-Each priority receives a predefined SLA window.
-
-| Priority | SLA |
-|-----------|------|
+| Priority | SLA Window |
+|----------|-----------|
 | Low | 24 Hours |
 | Medium | 8 Hours |
 | High | 4 Hours |
@@ -166,49 +171,35 @@ Each priority receives a predefined SLA window.
 Example:
 
 ```text
-Created Time:
-10:00 AM
-
-Priority:
-High
-
-SLA:
-4 Hours
-
-Deadline:
-2:00 PM
+Created Time : 10:00 AM
+Priority     : High
+SLA Window   : 4 Hours
+Deadline     : 2:00 PM
 ```
 
 ---
 
 ## Step 5: Risk Detection
 
-Remaining time is continuously calculated.
+The system continuously calculates:
 
 ```python
-Remaining Time =
-SLA Deadline - Current Time
+Remaining Time = SLA Deadline - Current Time
 ```
 
 Risk Levels:
 
-### Normal
+### 🟢 Normal
 
-```text
 More than 60 minutes remaining
-```
 
-### At Risk
+### 🟠 At Risk
 
-```text
 Less than 60 minutes remaining
-```
 
-### Breached
+### 🔴 Breached
 
-```text
-Remaining time < 0
-```
+Remaining time less than 0
 
 ---
 
@@ -222,46 +213,39 @@ OR
 
 - Complexity Score = 5
 
-The ticket enters:
+The ticket becomes:
 
 ```text
 CRITICAL BREACH RISK
 ```
 
-and appears in:
+The ticket is immediately displayed in:
 
-- Dashboard Alert Panel
-- WhatsApp Notifications
+- Critical Alert Panel
+- Dashboard Monitoring Section
+- WhatsApp Alert System
 
 ---
 
-## Step 7: Ticket Resolution
-
-Support Engineers can update status:
+## Step 7: Ticket Resolution Lifecycle
 
 ```text
 Open
-↓
+ ↓
 In Progress
-↓
+ ↓
 Resolved
-↓
+ ↓
 Closed
 ```
 
-Completed tickets are automatically moved to:
-
-```text
-Resolved & Closed Tickets
-```
-
-while maintaining historical records.
+Resolved and Closed tickets are automatically moved to a dedicated historical records page.
 
 ---
 
-# 🧠 AI Severity Classification Model
+# 🧠 AI Severity Classification
 
-The system uses:
+Model Used:
 
 ```text
 Groq API
@@ -308,69 +292,69 @@ Payment gateway failures affecting many users
 
 ```text
 Production database crash
-Authentication system down
-Complete application outage
+Authentication service outage
+Entire application unavailable
 ```
 
 ---
 
-# 📊 Dashboard Features
+# 📊 Features
 
-### Operational Dashboard
+## 📝 Create Support Ticket
+
+- Manual ticket creation
+- Bulk CSV upload
+- Instant AI severity analysis
+- Automatic SLA calculation
+
+![Create Ticket Module](images/upload_file.png)
+
+---
+
+## 📈 Operational Dashboard
 
 Displays:
 
 - Total Tickets
 - Active Tickets
-- Critical Tickets
+- Critical Priority Tickets
 - Breached Tickets
 - At Risk Tickets
+- Live SLA Countdown
+- Inline Status Updates
+
+![Operational Dashboard](images/dashboard.png)
 
 ---
 
-### Active Ticket Management
-
-Allows:
-
-- Status Updates
-- SLA Tracking
-- Risk Monitoring
-
----
-
-### Critical Alert Panel
-
-Highlights:
-
-- Tickets nearing SLA breach
-- High-risk incidents
-- Critical outages
-
----
-
-### Analytics Dashboard
+## 📊 SLA Analysis Dashboard
 
 Provides:
 
-- Priority Distribution
-- Risk Status Analysis
-- Complexity Trends
-- Resolution Metrics
 - Breach Rate Analysis
+- Priority Distribution
+- Risk Status Distribution
+- Complexity Trends
+- Resolution Performance
+
+![Analysis Dashboard](images/analysis.png)
 
 ---
 
-### Historical Records
+## ✅ Resolved & Closed Tickets
 
-Stores:
+Maintains historical records for:
 
 - Resolved Tickets
 - Closed Tickets
-- SLA Performance History
+- Resolution Metrics
+- Customer Statistics
+
+![Resolved Tickets](images/resolved.png)
 
 ---
 
-# 📱 WhatsApp Alert System
+## 📱 WhatsApp Critical Alerts
 
 Integrated using:
 
@@ -378,49 +362,38 @@ Integrated using:
 Twilio WhatsApp API
 ```
 
-Automatically sends alerts for:
+Example Alert:
 
 ```text
-CRITICAL BREACH RISK
+🚨 SLA OUTAGE EMERGENCY DISPATCH 🚨
 
 Ticket ID: T012
 Customer: Emergency Client
-Time Remaining: 29 Minutes
 
-Action Required Immediately
+Current Risk State:
+CRITICAL COUNTDOWN
+
+Time Left:
+29 Minutes before breach
+
+Immediate action required.
 ```
 
----
-
-# 🖥 Screenshots
-
-## Create Ticket Module
-
-![Create Ticket](images/upload_file.png)
+![WhatsApp Alert](images/alert_message.jpeg)
 
 ---
 
-## Operational Dashboard
+# 📊 Analytics Provided
 
-![Dashboard](images/dashboard.png)
+The system automatically generates:
 
----
-
-## Analytics Dashboard
-
-![Analytics](images/analysis.png)
-
----
-
-## Resolved & Closed Tickets
-
-![Resolved](images/resolved.png)
-
----
-
-## WhatsApp Critical Alert
-
-![Alert](images/alert_message.jpeg)
+- Breach Rate
+- Resolution Rate
+- Average Complexity
+- Average SLA Window
+- Priority Distribution
+- Risk Status Distribution
+- Ticket Status Breakdown
 
 ---
 
@@ -437,7 +410,7 @@ Action Required Immediately
 ## AI
 
 - Groq API
-- Llama 3.3 70B
+- Llama 3.3 70B Versatile
 
 ## Data Processing
 
@@ -461,33 +434,44 @@ Action Required Immediately
 # 📂 Project Structure
 
 ```text
+AI-Powered-SLA-Breach-Prediction-System/
+│
 ├── app.py
 ├── requirements.txt
+├── README.md
+│
+├── images/
+│   ├── upload_file.png
+│   ├── dashboard.png
+│   ├── analysis.png
+│   ├── resolved.png
+│   └── alert_message.jpeg
+│
 ├── data/
 │   └── tickets.csv
 │
 ├── src/
 │   ├── llm_service.py
 │   ├── sla_engine.py
+│   ├── analytics.py
 │   ├── ticket_service.py
-│   ├── whatsapp_alert.py
-│   └── analytics.py
+│   └── whatsapp_alert.py
 │
-└── README.md
+└── .env
 ```
 
 ---
 
 # 🚀 Future Enhancements
 
-- Email Alerts
+- Email Alert Integration
 - Multi-Agent AI Architecture
 - Root Cause Analysis
 - SLA Forecasting
-- Predictive Ticket Escalation
-- Team Performance Analytics
-- AWS Cloud Deployment
-- RAG-based Incident Knowledge Base
+- Predictive Escalation Engine
+- Knowledge Base Integration
+- RAG-Powered Incident Resolution
+- Cloud-Native Deployment
 
 ---
 
@@ -497,13 +481,15 @@ Action Required Immediately
 
 ✅ Faster Incident Response
 
-✅ Improved Customer Satisfaction
-
 ✅ Automated Ticket Prioritization
 
 ✅ Real-Time Risk Monitoring
 
+✅ Improved Customer Satisfaction
+
 ✅ Better Operational Visibility
+
+✅ Proactive Incident Management
 
 ---
 
@@ -517,4 +503,4 @@ AI / Machine Learning Enthusiast
 
 ---
 
-## ⭐ If you found this project useful, give it a star on GitHub.
+## ⭐ If you found this project useful, please give it a Star on GitHub.
