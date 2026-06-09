@@ -396,31 +396,31 @@ Action Required Immediately
 
 ## Create Ticket Module
 
-![Create Ticket](image/upload_file.png)
+![Create Ticket](images/upload_file.png)
 
 ---
 
 ## Operational Dashboard
 
-![Dashboard](image/dashboard.png)
+![Dashboard](images/dashboard.png)
 
 ---
 
 ## Analytics Dashboard
 
-![Analytics](image/analysis.png)
+![Analytics](images/analysis.png)
 
 ---
 
 ## Resolved & Closed Tickets
 
-![Resolved](image/resolved.png)
+![Resolved](images/resolved.png)
 
 ---
 
 ## WhatsApp Critical Alert
 
-![Alert](image/alert_message.jpeg)
+![Alert](images/alert_message.jpeg)
 
 ---
 
