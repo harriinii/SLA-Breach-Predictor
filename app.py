@@ -360,6 +360,8 @@ hr { border-color: #21262d !important; }
 </style>
 """, unsafe_allow_html=True)
 
+
+
 # ══════════════════════════════════════════════════════════
 # SESSION STATE
 # ══════════════════════════════════════════════════════════
@@ -492,11 +494,29 @@ CHART_COLORS = ["#58a6ff","#f78166","#e3b341","#3fb950","#d2a8ff","#79c0ff","#56
 
 def chart_layout():
     return dict(
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter", color="#8b949e", size=11),
-        title_font=dict(color="#e6edf3", size=13),
-        legend=dict(font=dict(color="#8b949e"), bgcolor="rgba(0,0,0,0)"),
-        margin=dict(t=36, b=16, l=16, r=16)
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+
+        font=dict(
+            family="Inter",
+            color="#e6edf3",
+            size=16
+        ),
+
+        title_font=dict(
+            color="#ffffff",
+            size=22
+        ),
+
+        legend=dict(
+            font=dict(
+                color="#e6edf3",
+                size=16
+            ),
+            bgcolor="rgba(0,0,0,0)"
+        ),
+
+        margin=dict(t=60, b=30, l=30, r=30)
     )
 
 def priority_pill(p):
