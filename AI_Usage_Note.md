@@ -1,81 +1,218 @@
-# AI Usage Note — SLA Breach Prediction System
+# AI Usage Note
 
-## Overview
+## Project Name
 
-This project uses Large Language Models (LLMs) as its core intelligence layer for ticket classification and risk reasoning. All AI interactions are stateless, prompt-driven, and performed via the Groq API.
-
----
-
-## Model Used
-
-| Property | Value |
-|---|---|
-| Provider | Groq |
-| Model | `llama-3.3-70b-versatile` |
-| Interface | REST API via `groq` Python SDK |
-| Context window | 128k tokens |
+AI-Powered SLA Breach Prediction System
 
 ---
 
-## AI-Powered Functions
+## 1. How AI Was Used
 
-### 1. Ticket Severity Classification (`analyze_ticket`)
+Artificial Intelligence was used throughout the development process to accelerate design, implementation, debugging, and documentation.
 
-Called on every ticket submission (manual or CSV). The LLM receives the raw ticket description and returns a structured severity assessment.
+### AI-Assisted Activities
 
-**Input:** Free-text issue description  
-**Output:** `(priority: str, complexity_score: int)`
+#### 1. System Design
 
-Evaluation criteria used in the prompt:
+AI helped design the overall architecture of the system including:
+
+* Ticket creation workflow
+* SLA calculation logic
+* Risk classification pipeline
+* Dashboard structure
+* WhatsApp notification flow
+
+#### 2. LLM-Based Ticket Classification
+
+AI assisted in creating prompts for ticket severity classification using Groq's Llama 3.3 model.
+
+The model analyzes support ticket descriptions and assigns:
+
+* Complexity Score (1–5)
+* Priority Level
+* Risk Category
+
+#### 3. Code Generation
+
+AI was used to generate and improve:
+
+* Streamlit UI components
+* SLA calculation functions
+* CSV processing logic
+* Ticket status workflows
+* Plotly analytics charts
+* Twilio notification integration
+
+#### 4. Debugging Assistance
+
+AI helped identify and resolve issues such as:
+
+* Timezone mismatches
+* Incorrect SLA countdown calculations
+* Streamlit deployment issues
+* DynamoDB integration errors
+* Plotly visualization bugs
+* Data persistence problems
+
+#### 5. Documentation
+
+AI assisted in creating:
+
+* README.md
+* Test Cases
+* Architecture diagrams
+* Workflow explanations
+* Technical documentation
+
+---
+
+## 2. What AI Got Wrong
+
+Although AI significantly accelerated development, several outputs required manual validation and correction.
+
+### Incorrect Severity Classification
+
+Initially, the AI model frequently returned:
+
+* Complexity Score = 1
+* Complexity Score = 5
+
+for most tickets, causing poor classification quality.
+
+This was resolved by:
+
+* Refining the prompt
+* Adding clearer scoring boundaries
+* Providing realistic examples
+
+---
+
+### Incorrect Parsing Logic
+
+AI originally generated parsing code expecting outputs such as:
+
+```text
+Priority: High
+Complexity: 4
+```
+
+However, the model was instructed to return only:
+
+```text
+4
+```
+
+This mismatch caused all tickets to default to score 1.
+
+Manual correction was required.
+
+---
+
+### Deployment Recommendations
+
+AI initially suggested DynamoDB as a storage solution.
+
+After reviewing challenge requirements:
+
+* SQLite/PostgreSQL were more appropriate.
+* Free-tier compatibility was improved using PostgreSQL-based solutions.
+
+---
+
+### UI Styling Issues
+
+Several generated Plotly chart configurations caused:
+
+```text
+multiple values for keyword argument 'legend'
+```
+
+Manual debugging was required to resolve chart rendering issues.
+
+---
+
+## 3. Best Prompts Used
+
+### Severity Classification Prompt
+
+```text
+You are an expert incident severity classifier.
+
+Analyze support ticket comments and assign a complexity score from 1–5.
+
+Consider:
+- User impact
 - Business impact
-- User impact (single user vs. many users)
 - Technical complexity
-- Service availability risk
-- Revenue impact
+- Service availability
 
-**Complexity → Priority mapping:**
-
-| Score | Priority |
-|---|---|
-| 1–2 | Low |
-| 3 | Medium |
-| 4 | High |
-| 5 | Critical |
+Return ONLY a single number.
+```
 
 ---
 
-### 2. Risk Reason Generation (`generate_risk_reason`)
+### Risk Reason Generation Prompt
 
-Called on-demand for tickets in `CRITICAL BREACH RISK` or `Breached` state. The LLM generates a short, human-readable explanation of why a ticket is at risk.
+```text
+Explain why this ticket is considered high risk.
 
-**Input:** Ticket description, complexity score, remaining minutes  
-**Output:** 1–2 sentence risk rationale string
+Include:
+- Business impact
+- User impact
+- SLA urgency
 
-Results are cached via `@st.cache_data(ttl=600)` to avoid redundant API calls on dashboard refresh.
-
----
-
-## Token Optimisation
-
-- Prompts are single-turn (no conversation history sent).
-- System prompts are compact; no chain-of-thought is requested unless reasoning is needed.
-- Risk reason responses are capped to ~50 tokens via `max_tokens` constraint.
-- `generate_risk_reason` results are cached for 10 minutes per ticket to suppress repeat calls during the 30-second dashboard auto-refresh cycle.
+Return a concise operational explanation.
+```
 
 ---
 
-## Limitations & Caveats
+### README Generation Prompt
 
-- The LLM does not have access to ticket history or customer context — it classifies purely from the description text.
-- Severity scores are non-deterministic; the same description may occasionally yield a ±1 score variation.
-- Groq API rate limits apply; bulk CSV imports process tickets sequentially to avoid hitting limits.
-- No PII scrubbing is applied before sending ticket text to the Groq API. Operators should ensure customer descriptions do not contain sensitive personal data.
+```text
+Generate a professional GitHub README for an AI-Powered SLA Breach Prediction System.
+
+Include:
+- Architecture
+- Workflow
+- Features
+- Screenshots
+- Tech Stack
+- Business Benefits
+```
 
 ---
 
-## Future AI Enhancements
+### Test Case Generation Prompt
 
-- RAG-based incident knowledge base for classification grounding
-- Multi-agent escalation reasoning
-- Root cause analysis via tool-augmented LLM
-- SLA breach forecasting using historical ticket embeddings
+```text
+Generate software test cases covering:
+
+- Manual ticket creation
+- CSV upload
+- SLA calculation
+- Risk detection
+- Status updates
+- Analytics dashboard
+```
+
+---
+
+## 4. Lessons Learned
+
+Through this project, the team learned:
+
+* Prompt engineering significantly impacts AI output quality.
+* AI-generated code must always be reviewed and validated.
+* LLMs are effective for ticket triage and operational support.
+* Human oversight remains essential for production-quality systems.
+* AI accelerates development but does not eliminate testing and debugging responsibilities.
+
+---
+
+## 5. Conclusion
+
+AI played a major role in accelerating the development of the SLA Breach Prediction System by assisting with architecture design, coding, debugging, analytics generation, and documentation.
+
+However, manual validation, testing, and refinement were necessary to ensure accuracy, reliability, and alignment with project requirements.
+
+The final solution combines AI-driven ticket intelligence with traditional software engineering practices to create a practical and scalable SLA monitoring platform.
