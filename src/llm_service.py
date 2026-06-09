@@ -17,7 +17,6 @@ def get_secret(key):
 client = Groq(api_key=get_secret("GROQ_API_KEY"))
 
 
-
 def get_priority_from_complexity(score):
     if score == 5:
         return "Critical"
@@ -29,70 +28,145 @@ def get_priority_from_complexity(score):
         return "Low"
 
 
+def normalize_score(comment, raw_score):
+    comment_lower = comment.lower()
+
+    level_5_keywords = [
+        "complete outage",
+        "entire application down",
+        "system down",
+        "production down",
+        "all users",
+        "everyone unable",
+        "cannot login",
+        "authentication down",
+        "database down",
+        "database failure",
+        "data loss",
+        "data corruption",
+        "business halted",
+        "service unavailable",
+        "application inaccessible",
+        "critical outage"
+    ]
+
+    level_4_keywords = [
+        "many users",
+        "multiple users",
+        "payment failed",
+        "payment failure",
+        "checkout failed",
+        "api failure",
+        "major impact",
+        "revenue impact",
+        "critical path",
+        "service degradation"
+    ]
+
+    low_keywords = [
+        "typo",
+        "alignment",
+        "font",
+        "color",
+        "ui issue",
+        "button color",
+        "spelling",
+        "cosmetic"
+    ]
+
+    if any(keyword in comment_lower for keyword in level_5_keywords):
+        return 5
+
+    if any(keyword in comment_lower for keyword in level_4_keywords):
+        return max(raw_score, 4)
+
+    if any(keyword in comment_lower for keyword in low_keywords):
+        return min(raw_score, 2)
+
+    return raw_score
+
+
 def analyze_ticket(comment):
     prompt = f"""
-You are an expert incident severity classifier with deep experience in SLA management and ticket triage.
+You are an expert SLA incident severity classifier.
 
-Your task is to analyze support ticket comments and assign a complexity risk score from 1-5 that accurately reflects the actual severity and scope of the issue.
+Classify the ticket into EXACTLY one complexity score from 1 to 5.
 
-Scoring Framework:
+Important:
+Return ONLY one number.
+Do not explain.
+Do not write priority.
+Do not write JSON.
+Do not write markdown.
 
-1 = Cosmetic Issue (No operational impact)
+Scoring rules:
 
-Visual/UI problems: misalignment, spacing, font rendering
-Text errors: typos, grammar, label mistakes
-Display glitches that don't affect functionality
-No users impacted beyond visual annoyance
+1 = Cosmetic issue
+- UI alignment
+- typo
+- spelling mistake
+- color/font/display issue
+- no functional impact
 
-2 = Isolated Customer Issue (Single user affected)
+2 = Isolated customer issue
+- only one customer affected
+- user-specific issue
+- workaround available
+- no system-wide problem
 
-Problem affects one specific customer only
-Workarounds exist or issue is user-specific
-Examples: individual invoice download failure, single account profile update error
-No systemic problem indicated
+3 = Functional bug
+- multiple users affected
+- feature partially working
+- non-critical module issue
+- reports, search, filters, export problems
 
-3 = Functional Bug (Multiple users, non-critical service)
+4 = Major service degradation
+- many users affected
+- payment/checkout/API issue
+- revenue-impacting feature broken
+- critical business flow partially broken
+- service still partially available
 
-Multiple users affected but core service still operational
-Non-payment, non-authentication systems involved
-Examples: export/report generation failing, search returning incorrect results, data filtering issues
-Users can partially access the application
+5 = Critical outage
+Use 5 ONLY when one or more of these are clearly true:
+- complete production outage
+- entire application unavailable
+- all users affected
+- authentication/login system down for all users
+- database/core infrastructure failure
+- data loss or data corruption
+- business operations completely stopped
+- no workaround exists
 
-4 = Major Service Degradation (Widespread impact, critical paths affected)
+Decision examples:
+"All users cannot login to production" -> 5
+"Database is down and app is inaccessible" -> 5
+"Payment failed for many users" -> 4
+"Checkout is failing for multiple customers" -> 4
+"Report export not working for some users" -> 3
+"One customer cannot download invoice" -> 2
+"Button alignment issue" -> 1
 
-Many users unable to complete key transactions
-Payment processing, checkout, or revenue-impacting features down
-API failures affecting integrations
-Significant business revenue or user satisfaction at risk
-Service is partially functional but critical paths broken
-
-5 = Critical Outage (Complete service failure)
-
-Production system completely unavailable
-Database or core infrastructure failure
-Authentication system down (users cannot log in)
-Data loss or corruption
-Entire application inaccessible to all users
-Business operations halted
-
-Critical Instructions:
-
-Avoid extreme scoring: Don't default to 1 or 5. Most real issues fall in 2-4 range.
-Look for scope indicators: "one customer" → likely 2, "many users" → likely 4, "some users" → likely 3
-Distinguish between user count and impact severity: One user with payment failure might be 2, but many users unable to pay is 4
-Consider system criticality: UI bugs are always low (1-2), payment/auth issues are always high (4-5)
-If unclear, err toward the middle (3) rather than extremes
-
-Ticket Comment:
+Ticket:
 {comment}
 
-Output ONLY a single number (1, 2, 3, 4, or 5) with no additional text, explanation, or reasoning.
+Answer only 1, 2, 3, 4, or 5.
 """
 
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a strict SLA classifier. You must output only one digit from 1 to 5."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0,
+        max_tokens=5
     )
 
     result = response.choices[0].message.content.strip()
@@ -106,41 +180,52 @@ Output ONLY a single number (1, 2, 3, 4, or 5) with no additional text, explanat
     else:
         complexity_score = 3
 
+    complexity_score = normalize_score(comment, complexity_score)
+
+    complexity_score = max(1, min(5, complexity_score))
+
     priority = get_priority_from_complexity(complexity_score)
 
     return priority, complexity_score
 
+
 def generate_risk_reason(comment, complexity_score, remaining_minutes):
-    
     prompt = f"""
-    You are an SLA Risk Analyst.
+You are an SLA Risk Analyst.
 
-    Ticket Comment:
-    {comment}
+Ticket Comment:
+{comment}
 
-    Complexity Score:
-    {complexity_score}
+Complexity Score:
+{complexity_score}
 
-    Remaining SLA Minutes:
-    {remaining_minutes}
+Remaining SLA Minutes:
+{remaining_minutes}
 
-    Explain in ONE SHORT sentence why this ticket is considered high risk.
+Explain in ONE short sentence why this ticket is risky.
 
-    Examples:
-
-    - Database outage affecting multiple customers.
-    - Critical payment failure impacting transactions.
-    - Only 15 minutes remain before SLA deadline.
-    - Authentication issue blocking user access.
-    - High complexity issue requiring multiple teams.
-
-    Return only the reason.
-    """
+Rules:
+- If remaining minutes is negative, mention SLA already breached.
+- If remaining minutes is less than 60, mention deadline risk.
+- If complexity score is 5, mention critical outage or severe business impact.
+- If complexity score is 4, mention major service degradation or business impact.
+- Return only one sentence.
+"""
 
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0
+        messages=[
+            {
+                "role": "system",
+                "content": "You explain SLA risk in one short sentence."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0,
+        max_tokens=60
     )
 
     return response.choices[0].message.content.strip()
