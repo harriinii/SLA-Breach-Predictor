@@ -493,14 +493,14 @@ AI-Powered-SLA-Breach-Prediction-System/
 
 ---
 
-# 👨‍💻 Author
+# 👨‍💻Team Members
 
-**Sri Nitish**
+**HARINI**
+**SRI NITISH**
+**SARIGA**
+**ATHISH**
 
-B.Tech Information Technology
-
-AI / Machine Learning Enthusiast
 
 ---
 
-## ⭐ If you found this project useful, please give it a Star on GitHub.
+## ⭐ If you found this project useful, please give it a Star.
