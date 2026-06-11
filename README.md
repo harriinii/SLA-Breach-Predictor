@@ -495,10 +495,10 @@ AI-Powered-SLA-Breach-Prediction-System/
 
 # 👨‍💻Team Members
 
-**HARINI**
-**SRI NITISH**
-**SARIGA**
-**ATHISH**
+- HARINI
+- SRI NITISH
+- SARIGA
+- ATHISH
 
 
 ---
